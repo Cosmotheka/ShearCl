@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 import pymaster as nmt
 import utils as ut
 import os
-import sys
 
 
 parser = ArgumentParser()
@@ -46,7 +45,8 @@ l_eff = b.get_effective_ells()
 
 
 ut.printflush("Weights")
-prefix_map1 = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number, o.nside)
+prefix_map1 = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number,
+                                                            o.nside)
 pix1 = np.load(prefix_map1 + '_goodpix.npz')['pix']
 w1 = np.load(prefix_map1 + '_w.npz')['w']
 w1_map = np.zeros(npix)
@@ -57,7 +57,8 @@ if is_auto:
     w2 = w1
     w2_map = w1_map
 else:
-    prefix_map2 = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number_2, o.nside)
+    prefix_map2 = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number_2,
+                                                                o.nside)
     pix2 = np.load(prefix_map2 + '_goodpix.npz')['pix']
     w2 = np.load(prefix_map2 + '_w.npz')['w']
     w2_map = np.zeros(npix)
@@ -65,6 +66,8 @@ else:
 
 
 ut.printflush("Fields")
+
+
 def get_field(prefix_map, pix_arr, w_map, is_psf=False, i_rot=-1):
     if is_psf:
         fname_map = prefix_map + "_wpsfe"
@@ -79,6 +82,8 @@ def get_field(prefix_map, pix_arr, w_map, is_psf=False, i_rot=-1):
     e2_map = np.zeros(npix)
     e2_map[pix_arr] = d['e2'] / w_map[pix_arr]
     return nmt.NmtField(w_map, [-e1_map, e2_map], n_iter=o.n_iter)
+
+
 f1 = get_field(prefix_map1, pix1, w1_map, is_psf=o.is_psf_a, i_rot=-1)
 if is_auto and not o.is_psf_x:
     f2 = f1
@@ -111,6 +116,7 @@ def get_fname_cl(irot):
     fname_cls += '.npz'
     return fname_cls
 
+
 if o.irot_0 == -1:
     ut.printflush("Cl")
     cls_coupled = nmt.compute_coupled_cell(f1, f2)
@@ -126,7 +132,8 @@ if o.irot_0 == -1:
         nls = np.zeros_like(cls)
 
     ut.printflush("Writing")
-    np.savez(get_fname_cl(-1), ls=l_eff, cls=cls, nls=nls, cls_coupled=cls_coupled)
+    np.savez(get_fname_cl(-1), ls=l_eff, cls=cls,
+             nls=nls, cls_coupled=cls_coupled)
 else:
     ut.printflush("Rotations")
     for irot in range(o.irot_0, o.irot_f):

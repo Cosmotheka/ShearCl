@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 import pymaster as nmt
 import utils as ut
 import os
-import sys
 import pyccl as ccl
 
 
@@ -62,6 +61,7 @@ def get_tracer(bin_no):
     tr = ccl.WeakLensingTracer(cosmo, (zi, dndz))
     return tr
 
+
 tracers = {}
 if o.bin_a1 not in tracers:
     tracers[o.bin_a1] = get_tracer(o.bin_a1)
@@ -101,7 +101,9 @@ def get_cl(trs, b1, b2):
         else:
             mskprod *= get_field(b2, return_mask=True)
         fsky = np.mean(mskprod)
-        return w.couple_cell([sl, cl0, cl0, cl0])/fsky + np.array([nl, cl0, cl0, nl])
+        return w.couple_cell([sl, cl0, cl0, cl0])/fsky + \
+            np.array([nl, cl0, cl0, nl])
+
 
 clt = {}
 k = '%d%d' % (o.bin_a1, o.bin_b1)
@@ -120,7 +122,8 @@ if k not in clt:
 
 ut.printflush("CMCM")
 fname_cmcm = predir + 'cls_metacal_cmcm_bins_'
-fname_cmcm += '%d%d_%d%d_ns%d.fits' % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, o.nside)
+fname_cmcm += '%d%d_%d%d_ns%d.fits' % (o.bin_a1, o.bin_a2, o.bin_b1,
+                                       o.bin_b2, o.nside)
 
 cw = nmt.NmtCovarianceWorkspace()
 fields_s = {}
@@ -164,13 +167,17 @@ if o.full_noise:
             else:
                 ut.printflush(" - Fields")
                 if b_a1 not in fields_a[n_a1]:
-                    fields_a[n_a1][b_a1] = get_field(b_a1, mask_sigma=bool(n_a1))
+                    fields_a[n_a1][b_a1] = get_field(b_a1,
+                                                     mask_sigma=bool(n_a1))
                 if b_a2 not in fields_a[n_a2]:
-                    fields_a[n_a2][b_a2] = get_field(b_a2, mask_sigma=bool(n_a2))
+                    fields_a[n_a2][b_a2] = get_field(b_a2,
+                                                     mask_sigma=bool(n_a2))
                 if b_b1 not in fields_a[n_b1]:
-                    fields_a[n_b1][b_b1] = get_field(b_b1, mask_sigma=bool(n_b1))
+                    fields_a[n_b1][b_b1] = get_field(b_b1,
+                                                     mask_sigma=bool(n_b1))
                 if b_b2 not in fields_a[n_b2]:
-                    fields_a[n_b2][b_b2] = get_field(b_b2, mask_sigma=bool(n_b2))
+                    fields_a[n_b2][b_b2] = get_field(b_b2,
+                                                     mask_sigma=bool(n_b2))
                 ut.printflush(" - Computing " + name)
                 cw_sn[name].compute_coupling_coefficients(fields_a[n_a1][b_a1],
                                                           fields_a[n_a2][b_a2],
@@ -178,7 +185,6 @@ if o.full_noise:
                                                           fields_a[n_b2][b_b2])
                 cw_sn[name].write_to(fname_cmcm)
 
-            
     if o.bin_a1 == o.bin_b1:
         get_cw_sn(o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, 1, 0, 1, 0)
     if o.bin_a1 == o.bin_b2:
@@ -187,7 +193,6 @@ if o.full_noise:
         get_cw_sn(o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, 0, 1, 1, 0)
     if o.bin_a2 == o.bin_b2:
         get_cw_sn(o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, 0, 1, 0, 1)
-
 
     ut.printflush("CMCM - NN")
     prefix_cmcm = predir + 'cls_metacal_cmcm_nn_bins_'
@@ -208,8 +213,10 @@ if o.full_noise:
                 for b in [b_a1, b_a2, b_b1, b_b2]:
                     fields_n[b] = get_field(b, mask_sigma=True)
                 ut.printflush(" - Computing " + name)
-                cw_nn[name].compute_coupling_coefficients(fields_n[b_a1], fields_n[b_a2],
-                                                          fields_n[b_b1], fields_n[b_b2])
+                cw_nn[name].compute_coupling_coefficients(fields_n[b_a1],
+                                                          fields_n[b_a2],
+                                                          fields_n[b_b1],
+                                                          fields_n[b_b2])
                 cw_nn[name].write_to(fname_cmcm)
 
     if (((o.bin_a1 == o.bin_b1) and (o.bin_a2 == o.bin_b2)) or
@@ -233,12 +240,13 @@ nbpw = wa.wsp.bin.n_bands
 
 
 ut.printflush("Covariance")
+cshape = [nbpw, 4, nbpw, 4]
 cov = nmt.gaussian_covariance(cw, 2, 2, 2, 2,
                               clt['%d%d' % (o.bin_a1, o.bin_b1)],
                               clt['%d%d' % (o.bin_a1, o.bin_b2)],
                               clt['%d%d' % (o.bin_a2, o.bin_b1)],
                               clt['%d%d' % (o.bin_a2, o.bin_b2)],
-                              wa, wb).reshape([nbpw, 4, nbpw, 4])
+                              wa, wb).reshape(cshape)
 if o.full_noise:
     name = '%d%d_%d%d' % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2)
     cl_ones = np.array([cl1, cl0, cl0, cl1])
@@ -249,36 +257,38 @@ if o.full_noise:
                                        cl_zeros,
                                        cl_zeros,
                                        clt['%d%d' % (o.bin_a2, o.bin_b2)],
-                                       wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area
+                                       wa, wb).reshape(cshape)*pix_area
         if o.bin_a2 == o.bin_b2:
             cov += nmt.gaussian_covariance(cw_nn[name], 2, 2, 2, 2,
-                                           cl_ones, cl_zeros, cl_zeros, cl_ones,
-                                           wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area**2
+                                           cl_ones, cl_zeros,
+                                           cl_zeros, cl_ones,
+                                           wa, wb).reshape(cshape)*pix_area**2
     if o.bin_a1 == o.bin_b2:
         cov += nmt.gaussian_covariance(cw_sn[name + '_10_01'], 2, 2, 2, 2,
                                        cl_zeros,
-                                       cl_ones, 
+                                       cl_ones,
                                        clt['%d%d' % (o.bin_a2, o.bin_b1)],
                                        cl_zeros,
-                                       wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area
+                                       wa, wb).reshape(cshape)*pix_area
         if o.bin_a2 == o.bin_b1:
             cov += nmt.gaussian_covariance(cw_nn[name], 2, 2, 2, 2,
-                                           cl_zeros, cl_ones, cl_ones, cl_zeros,
-                                           wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area**2
+                                           cl_zeros, cl_ones,
+                                           cl_ones, cl_zeros,
+                                           wa, wb).reshape(cshape)*pix_area**2
     if o.bin_a2 == o.bin_b1:
         cov += nmt.gaussian_covariance(cw_sn[name + '_01_10'], 2, 2, 2, 2,
                                        cl_zeros,
                                        clt['%d%d' % (o.bin_a1, o.bin_b2)],
                                        cl_ones,
                                        cl_zeros,
-                                       wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area
+                                       wa, wb).reshape(cshape)*pix_area
     if o.bin_a2 == o.bin_b2:
         cov += nmt.gaussian_covariance(cw_sn[name + '_01_01'], 2, 2, 2, 2,
                                        clt['%d%d' % (o.bin_a1, o.bin_b1)],
                                        cl_zeros,
                                        cl_zeros,
                                        cl_ones,
-                                       wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area
+                                       wa, wb).reshape(cshape)*pix_area
 
 ut.printflush("Writing")
 fname_cov = predir + 'cls_metacal_covar_bins_'
@@ -286,5 +296,6 @@ if not o.old_nka:
     fname_cov += "new_nka_"
 if o.full_noise:
     fname_cov += "full_noise_"
-fname_cov += '%d%d_%d%d_ns%d.npz' % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, o.nside)
+fname_cov += '%d%d_%d%d_ns%d.npz' % (o.bin_a1, o.bin_a2,
+                                     o.bin_b1, o.bin_b2, o.nside)
 np.savez(fname_cov, cov=cov)

@@ -2,7 +2,6 @@ import numpy as np
 from astropy.io import fits
 from argparse import ArgumentParser
 import healpy as hp
-import sys
 import utils as ut
 
 
@@ -17,7 +16,8 @@ pix_area = 4 * np.pi / npix
 
 predir = ut.rootpath + '/'
 prefix_cat = predir + 'outputs/catalog_metacal_bin%d' % (o.bin_number)
-prefix_map = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number, o.nside)
+prefix_map = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number,
+                                                           o.nside)
 
 
 ut.printflush("Computing means")
@@ -60,12 +60,13 @@ goodpix = map_w > 0
 np.savez(prefix_map + "_goodpix.npz", pix=np.arange(npix)[goodpix].astype(int))
 np.savez(prefix_map + "_w.npz", w=map_w[goodpix])
 
+
 def get_ellip_maps(rot=False):
     if rot:
         phi = 2*np.pi*np.random.rand(ngal)
         c = np.cos(2*phi)
         s = np.sin(2*phi)
-        e1 =  c * cat['e1'] + s * cat['e2']
+        e1 = c * cat['e1'] + s * cat['e2']
         e2 = -s * cat['e1'] + c * cat['e2']
     else:
         e1 = cat['e1']
@@ -74,6 +75,7 @@ def get_ellip_maps(rot=False):
     we2 = np.bincount(ipix, weights=e2, minlength=npix)[goodpix]
     return we1, we2
 
+
 map_we1, map_we2 = get_ellip_maps()
 np.savez(prefix_map + "_we.npz", e1=map_we1, e2=map_we2)
 
@@ -81,7 +83,8 @@ map_wpsfe1 = np.bincount(ipix, weights=cat['psf_e1'], minlength=npix)[goodpix]
 map_wpsfe2 = np.bincount(ipix, weights=cat['psf_e2'], minlength=npix)[goodpix]
 np.savez(prefix_map + "_wpsfe.npz", e1=map_wpsfe1, e2=map_wpsfe2)
 
-map_w2s2 = np.bincount(ipix, weights=0.5*(cat['e1']**2+cat['e2']**2), minlength=npix)[goodpix]
+map_w2s2 = np.bincount(ipix, weights=0.5*(cat['e1']**2+cat['e2']**2),
+                       minlength=npix)[goodpix]
 np.savez(prefix_map + "_w2s2.npz", w2s2=map_w2s2)
 
 

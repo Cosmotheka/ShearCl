@@ -3,8 +3,6 @@ import healpy as hp
 from argparse import ArgumentParser
 import pymaster as nmt
 import utils as ut
-import os
-import sys
 import pyccl as ccl
 
 
@@ -22,7 +20,9 @@ ut.printflush("Running %d-PSF" % (o.bin_number))
 
 ut.printflush("MCM")
 predir_mcm = predir + 'cls_metacal_mcm_bins_'
-fname_mcm = predir_mcm + '%d%d_ns%d.fits' % (o.bin_number, o.bin_number, o.nside)
+fname_mcm = predir_mcm + '%d%d_ns%d.fits' % (o.bin_number,
+                                             o.bin_number,
+                                             o.nside)
 w = nmt.NmtWorkspace()
 w.read_from(fname_mcm)
 
@@ -41,7 +41,8 @@ tr = ccl.WeakLensingTracer(cosmo, (zi, dndz))
 sl = ccl.angular_cl(cosmo, tr, tr, ls)
 # Noise
 nl = np.zeros(3*o.nside)
-fname_nl = predir + "maps_metacal_bin%d_ns%d_nells.npz" % (o.bin_number, o.nside)
+fname_nl = predir + "maps_metacal_bin%d_ns%d_nells.npz" % (o.bin_number,
+                                                           o.nside)
 d = np.load(fname_nl)
 nl[2:] = d['nl_cov']
 # G-G
@@ -50,7 +51,10 @@ msk = np.load(prefix + '_w.npz')['w']
 fsky = np.sum(msk**2) / npix
 cl_gg = w.couple_cell([sl, cl0, cl0, cl0])/fsky + np.array([nl, cl0, cl0, nl])
 # PSF-PSF
-fname_apsf = predir + "cls_metacal_cls_bins_%d%d_ns%d_apsf.npz" % (o.bin_number, o.bin_number, o.nside)
+fname_apsf = predir + "cls_metacal_cls_bins_"
+fname_apsf += "%d%d_ns%d_apsf.npz" % (o.bin_number,
+                                      o.bin_number,
+                                      o.nside)
 dpsf = np.load(fname_apsf)
 cl_pp = dpsf['cls_coupled'] / fsky
 # G-PSF

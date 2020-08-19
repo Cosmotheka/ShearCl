@@ -11,8 +11,10 @@ o = parser.parse_args()
 
 nrows_per_chunk = 1000000
 predir = ut.rootpath + '/'
-fname_mcal = predir + 'DES_data/shear_catalog/mcal-y1a1-combined-riz-unblind-v4-matched.fits'
-fname_bins = predir + 'DES_data/shear_catalog/y1_source_redshift_binning_v1.fits'
+fname_mcal = predir + 'DES_data/shear_catalog/'
+fname_mcal += 'mcal-y1a1-combined-riz-unblind-v4-matched.fits'
+fname_bins = predir + 'DES_data/shear_catalog/'
+fname_bins += 'y1_source_redshift_binning_v1.fits'
 prefix_out = predir + 'outputs/catalog_metacal_bin%d' % (o.bin_number)
 
 
@@ -43,8 +45,10 @@ def get_fits_iterator(fname, colnames, hdu=1, nrows_per_chunk=None):
 
 def get_iterator_metacal():
     itr_cat = get_fits_iterator(fname_mcal,
-                                ['coadd_objects_id', 'e1', 'e2', 'psf_e1', 'psf_e2',
-                                 'ra', 'dec', 'flags_select', 'R11', 'R22', 'R12', 'R21'],
+                                ['coadd_objects_id', 'e1', 'e2',
+                                 'psf_e1', 'psf_e2', 'ra', 'dec',
+                                 'flags_select', 'R11', 'R22',
+                                 'R12', 'R21'],
                                 nrows_per_chunk=nrows_per_chunk)
     itr_bin = get_fits_iterator(fname_bins,
                                 ['coadd_objects_id', 'zbin_mcal',
@@ -101,12 +105,14 @@ def create_subsamples(iterator, fnames, cols_save=None, masks=None):
             cols_save = arrs[im].keys()
         fmt_dir = {'int64': 'K',
                    'float64': 'D'}
+        dtyp = str(arrs[im][k].dytpe)
         cols = fits.ColDefs([fits.Column(name=k,
-                                         format=fmt_dir[str(arrs[im][k].dtype)],
+                                         format=fmt_dir[dtyp],
                                          array=arrs[im][k])
                              for k in cols_save])
         hdu = fits.BinTableHDU.from_columns(cols)
         hdu.writeto(fnames[im])
+
 
 binflags = ['zbin_mcal', 'zbin_mcal_1p',
             'zbin_mcal_1m', 'zbin_mcal_2p',
