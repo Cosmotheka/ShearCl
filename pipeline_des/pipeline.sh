@@ -8,8 +8,10 @@ mem=0.5
 nc=12
 irot_0=0
 nrot=1000
+# Set to true if you want to extract the N(z)s
+run_dndz=false
 # Set to true if you want to run the cleanup stage
-run_cleanup=true
+run_cleanup=false
 # Set to true if you want to run the mapping stage
 # (don't do this until cleanup has finished).
 run_mapping=false
@@ -25,14 +27,21 @@ run_windows=false
 run_cls_extra=false
 # Set to true if you want to run the covariance stage
 # (don't do this until the C_ell stage has finished).
-run_cov_signal=false
+run_cov_signal=true
 # Set to true if you want to compute covariances for
 # the PSF null tests (don't do this until the C_ell
 # stage has finished).
-run_cov_psf=false
+run_cov_psf=true
 
 
 mkdir -p /mnt/extraspace/damonge/S8z_data/outputs
+
+if [ $run_dndz = true ] ; then
+    echo "dNdz"
+    python3 dndz.py
+    echo " "
+fi
+
 
 echo "Catalog cleanup"
 for b in {0..3}
@@ -46,7 +55,7 @@ do
     fi
 done
 echo " "
-exit
+
 
 echo "Mapping"
 for b in {0..3}
@@ -99,6 +108,7 @@ do
         fi
     done
 done
+echo " "
 
 
 echo "Cls - rotations and PSF"
@@ -125,7 +135,7 @@ do
     pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --is-psf-a"
     echo ${comment}
-    if [ $run_cls_signal = true ] ; then
+    if [ $run_cls_extra = true ] ; then
         ${comm}
     fi
 done
