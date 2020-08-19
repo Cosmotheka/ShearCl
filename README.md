@@ -15,6 +15,8 @@ The paper presents measurements of the shear power spectrum, their covariance ma
   * Noise bias and non-Gaussian contributions to the shear power spectrum covariance matrix can be found [here](dead_link).
   * PSF null tests can be found [here](dead_link).
 
+These data are available in [SACC](https://github.com/LSSTDESC/sacc) format. See the [documentation](https://sacc.readthedocs.io/en/latest/) in the SACC repository and the examples provided below for details on how to read and interpret the data.
+
 ## A working pipeline
 
 ## Examples
