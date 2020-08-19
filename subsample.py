@@ -1,6 +1,7 @@
 import numpy as np
 from astropy.io import fits
 from argparse import ArgumentParser
+import utils as ut
 
 
 parser = ArgumentParser()
@@ -9,7 +10,7 @@ o = parser.parse_args()
 
 
 nrows_per_chunk = 1000000
-predir = '/mnt/extraspace/damonge/S8z_data/'
+predir = ut.rootpath + '/'
 fname_mcal = predir + 'DES_data/shear_catalog/mcal-y1a1-combined-riz-unblind-v4-matched.fits'
 fname_bins = predir + 'DES_data/shear_catalog/y1_source_redshift_binning_v1.fits'
 prefix_out = predir + 'outputs/catalog_metacal_bin%d' % (o.bin_number)

@@ -3,11 +3,7 @@ from astropy.io import fits
 from argparse import ArgumentParser
 import healpy as hp
 import sys
-
-
-def printflush(msg):
-    print(msg)
-    sys.stdout.flush()
+import utils as ut
 
 
 parser = ArgumentParser()
@@ -19,13 +15,13 @@ o = parser.parse_args()
 npix = hp.nside2npix(o.nside)
 pix_area = 4 * np.pi / npix
 
-predir = '/mnt/extraspace/damonge/S8z_data/'
+predir = ut.rootpath + '/'
 prefix_cat = predir + 'outputs/catalog_metacal_bin%d' % (o.bin_number)
 prefix_map = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number, o.nside)
 
 
-printflush("Computing means")
-printflush("0")
+ut.printflush("Computing means")
+ut.printflush("0")
 cat = fits.open(prefix_cat + '_zbin_mcal.fits')[1].data
 ngal = len(cat)
 e1_mean = np.mean(cat['e1'])
@@ -33,13 +29,13 @@ e2_mean = np.mean(cat['e2'])
 e1_means = {}
 e2_means = {}
 for typ in ['1p', '1m', '2p', '2m']:
-    printflush(typ)
+    ut.printflush(typ)
     f = fits.open(prefix_cat + '_zbin_mcal_' + typ + '.fits')
     e1_means[typ] = np.mean((f[1].data)['e1'])
     e2_means[typ] = np.mean((f[1].data)['e2'])
     f.close()
 
-printflush("Calibrating")
+ut.printflush("Calibrating")
 Rg = np.array([[np.mean(cat['R11']), np.mean(cat['R12'])],
                [np.mean(cat['R21']), np.mean(cat['R22'])]])
 Rs = np.array([[(e1_means['1p']-e1_means['1m'])/0.02,
@@ -48,14 +44,14 @@ Rs = np.array([[(e1_means['1p']-e1_means['1m'])/0.02,
                 (e2_means['2p']-e2_means['2m'])/0.02]])
 Rmat = Rg + Rs
 one_plus_m = np.sum(np.diag(Rmat))*0.5
-printflush(Rg)
-printflush(Rs)
-printflush(Rmat)
-printflush(one_plus_m)
+ut.printflush(Rg)
+ut.printflush(Rs)
+ut.printflush(Rmat)
+ut.printflush(one_plus_m)
 cat['e1'] = (cat['e1'] - e1_mean) / one_plus_m
 cat['e2'] = (cat['e2'] - e2_mean) / one_plus_m
 
-printflush("Mapping")
+ut.printflush("Mapping")
 ipix = hp.ang2pix(o.nside,
                   np.radians(90 - cat['dec']),
                   np.radians(cat['ra']))
@@ -89,13 +85,13 @@ map_w2s2 = np.bincount(ipix, weights=0.5*(cat['e1']**2+cat['e2']**2), minlength=
 np.savez(prefix_map + "_w2s2.npz", w2s2=map_w2s2)
 
 
-printflush("Rotations")
+ut.printflush("Rotations")
 for i in range(o.nrot):
-    printflush("%d / %d " % (i, o.nrot))
+    ut.printflush("%d / %d " % (i, o.nrot))
     map_we1, map_we2 = get_ellip_maps(rot=True)
     np.savez(prefix_map + "_we_rot%d.npz" % i, e1=map_we1, e2=map_we2)
 
-printflush("N_ell quantities")
+ut.printflush("N_ell quantities")
 nl_bias = np.sum((cat['e1']**2+cat['e2']**2)*0.5) * pix_area / npix
 nl_cov = nl_bias / np.mean(map_w**2)
 np.savez(prefix_map + "_nells.npz", nl_bias=nl_bias, nl_cov=nl_cov)

@@ -2,13 +2,9 @@ import numpy as np
 import healpy as hp
 from argparse import ArgumentParser
 import pymaster as nmt
+import utils as ut
 import os
 import sys
-
-
-def printflush(msg):
-    print(msg)
-    sys.stdout.flush()
 
 
 parser = ArgumentParser()
@@ -33,10 +29,10 @@ is_auto = o.bin_number_2 == o.bin_number
 
 npix = hp.nside2npix(o.nside)
 
-predir = '/mnt/extraspace/damonge/S8z_data/'
+predir = ut.rootpath + '/'
 
 
-printflush("Binning")
+ut.printflush("Binning")
 l_edges = np.array([0, 30, 60, 90, 120, 150, 180, 210, 240, 272, 309,
                     351, 398, 452, 513, 582, 661, 750, 852, 967, 1098,
                     1247, 1416, 1608, 1826, 2073, 2354, 2673, 3035,
@@ -49,7 +45,7 @@ b = nmt.NmtBin.from_edges(l_edges[:-1], l_edges[1:])
 l_eff = b.get_effective_ells()
 
 
-printflush("Weights")
+ut.printflush("Weights")
 prefix_map1 = predir + 'outputs/maps_metacal_bin%d_ns%d' % (o.bin_number, o.nside)
 pix1 = np.load(prefix_map1 + '_goodpix.npz')['pix']
 w1 = np.load(prefix_map1 + '_w.npz')['w']
@@ -68,7 +64,7 @@ else:
     w2_map[pix2] = w2
 
 
-printflush("Fields")
+ut.printflush("Fields")
 def get_field(prefix_map, pix_arr, w_map, is_psf=False, i_rot=-1):
     if is_psf:
         fname_map = prefix_map + "_wpsfe"
@@ -90,15 +86,15 @@ else:
     f2 = get_field(prefix_map2, pix2, w2_map, is_psf=o.is_psf_x, i_rot=-1)
 
 
-printflush("MCM")
+ut.printflush("MCM")
 fname_mcm = predir + 'outputs/cls_metacal_mcm_'
 fname_mcm += 'bins_%d%d_ns%d.fits' % (o.bin_number, o.bin_number_2, o.nside)
 w = nmt.NmtWorkspace()
 if os.path.isfile(fname_mcm) and not o.recompute_mcm:
-    printflush(" - Reading")
+    ut.printflush(" - Reading")
     w.read_from(fname_mcm)
 else:
-    printflush(" - Computing")
+    ut.printflush(" - Computing")
     w.compute_coupling_matrix(f1, f2, b)
     w.write_to(fname_mcm)
 
@@ -116,10 +112,10 @@ def get_fname_cl(irot):
     return fname_cls
 
 if o.irot_0 == -1:
-    printflush("Cl")
+    ut.printflush("Cl")
     cls_coupled = nmt.compute_coupled_cell(f1, f2)
     cls = w.decouple_cell(cls_coupled)
-    printflush("Nl")
+    ut.printflush("Nl")
     if is_auto and not o.is_psf_x:
         s = np.load(prefix_map1 + '_nells.npz')
         nls_coupled = np.zeros([4, 3*o.nside])
@@ -129,12 +125,12 @@ if o.irot_0 == -1:
     else:
         nls = np.zeros_like(cls)
 
-    printflush("Writing")
+    ut.printflush("Writing")
     np.savez(get_fname_cl(-1), ls=l_eff, cls=cls, nls=nls, cls_coupled=cls_coupled)
 else:
-    printflush("Rotations")
+    ut.printflush("Rotations")
     for irot in range(o.irot_0, o.irot_f):
-        printflush("%d (%d %d)" % (irot, o.irot_0, o.irot_f))
+        ut.printflush("%d (%d %d)" % (irot, o.irot_0, o.irot_f))
         f = get_field(prefix_map1, pix1, w1_map, is_psf=False, i_rot=irot)
         cls = w.decouple_cell(nmt.compute_coupled_cell(f, f))
         nls = np.zeros_like(cls)

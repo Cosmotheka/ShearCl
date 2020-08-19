@@ -2,14 +2,10 @@ import numpy as np
 import healpy as hp
 from argparse import ArgumentParser
 import pymaster as nmt
+import utils as ut
 import os
 import sys
 import pyccl as ccl
-
-
-def printflush(msg):
-    print(msg)
-    sys.stdout.flush()
 
 
 parser = ArgumentParser()
@@ -27,15 +23,14 @@ parser.add_argument("--full-noise", default=False, action='store_true',
                     help="Full noise calculation?")
 o = parser.parse_args()
 
-
-predir = '/mnt/extraspace/damonge/S8z_data/outputs/'
+predir = ut.rootpath + '/outputs/'
 
 npix = hp.nside2npix(o.nside)
 pix_area = 4*np.pi/npix
 
-printflush("Running %d-%d %d-%d" % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2))
+ut.printflush("Running %d-%d %d-%d" % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2))
 
-printflush("Theory spectra")
+ut.printflush("Theory spectra")
 ls = np.arange(3*o.nside)
 cl0 = np.zeros(3*o.nside)
 cl1 = np.ones(3*o.nside)
@@ -123,7 +118,7 @@ if k not in clt:
     clt[k] = get_cl(tracers, o.bin_a2, o.bin_b2)
 
 
-printflush("CMCM")
+ut.printflush("CMCM")
 fname_cmcm = predir + 'cls_metacal_cmcm_bins_'
 fname_cmcm += '%d%d_%d%d_ns%d.fits' % (o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, o.nside)
 
@@ -131,10 +126,10 @@ cw = nmt.NmtCovarianceWorkspace()
 fields_s = {}
 fields_n = {}
 if os.path.isfile(fname_cmcm) and not o.recompute_mcm:
-    printflush(" - Reading")
+    ut.printflush(" - Reading")
     cw.read_from(fname_cmcm)
 else:
-    printflush(" - Fields")
+    ut.printflush(" - Fields")
     if o.bin_a1 not in fields_s:
         fields_s[o.bin_a1] = get_field(o.bin_a1)
     if o.bin_a2 not in fields_s:
@@ -143,12 +138,12 @@ else:
         fields_s[o.bin_b1] = get_field(o.bin_b1)
     if o.bin_b2 not in fields_s:
         fields_s[o.bin_b2] = get_field(o.bin_b2)
-    printflush(" - Computing")
+    ut.printflush(" - Computing")
     cw.compute_coupling_coefficients(fields_s[o.bin_a1], fields_s[o.bin_a2],
                                      fields_s[o.bin_b1], fields_s[o.bin_b2])
     cw.write_to(fname_cmcm)
 if o.full_noise:
-    printflush("CMCM - SN")
+    ut.printflush("CMCM - SN")
     prefix_cmcm = predir + 'cls_metacal_cmcm_sn_bins_'
     cw_sn = {}
 
@@ -164,10 +159,10 @@ if o.full_noise:
             cw_sn[name] = nmt.NmtCovarianceWorkspace()
             fname_cmcm = prefix_cmcm + name + '_ns%d.fits' % o.nside
             if os.path.isfile(fname_cmcm):
-                printflush(" - Reading")
+                ut.printflush(" - Reading")
                 cw_sn[name].read_from(fname_cmcm)
             else:
-                printflush(" - Fields")
+                ut.printflush(" - Fields")
                 if b_a1 not in fields_a[n_a1]:
                     fields_a[n_a1][b_a1] = get_field(b_a1, mask_sigma=bool(n_a1))
                 if b_a2 not in fields_a[n_a2]:
@@ -176,7 +171,7 @@ if o.full_noise:
                     fields_a[n_b1][b_b1] = get_field(b_b1, mask_sigma=bool(n_b1))
                 if b_b2 not in fields_a[n_b2]:
                     fields_a[n_b2][b_b2] = get_field(b_b2, mask_sigma=bool(n_b2))
-                printflush(" - Computing " + name)
+                ut.printflush(" - Computing " + name)
                 cw_sn[name].compute_coupling_coefficients(fields_a[n_a1][b_a1],
                                                           fields_a[n_a2][b_a2],
                                                           fields_a[n_b1][b_b1],
@@ -194,7 +189,7 @@ if o.full_noise:
         get_cw_sn(o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2, 0, 1, 0, 1)
 
 
-    printflush("CMCM - NN")
+    ut.printflush("CMCM - NN")
     prefix_cmcm = predir + 'cls_metacal_cmcm_nn_bins_'
     cw_nn = {}
 
@@ -206,13 +201,13 @@ if o.full_noise:
             cw_nn[name] = nmt.NmtCovarianceWorkspace()
             fname_cmcm = prefix_cmcm + name + '_ns%d.fits' % o.nside
             if os.path.isfile(fname_cmcm):
-                printflush(" - Reading")
+                ut.printflush(" - Reading")
                 cw_nn[name].read_from(fname_cmcm)
             else:
-                printflush(" - Fields")
+                ut.printflush(" - Fields")
                 for b in [b_a1, b_a2, b_b1, b_b2]:
                     fields_n[b] = get_field(b, mask_sigma=True)
-                printflush(" - Computing " + name)
+                ut.printflush(" - Computing " + name)
                 cw_nn[name].compute_coupling_coefficients(fields_n[b_a1], fields_n[b_a2],
                                                           fields_n[b_b1], fields_n[b_b2])
                 cw_nn[name].write_to(fname_cmcm)
@@ -222,7 +217,7 @@ if o.full_noise:
         get_cw_nn(o.bin_a1, o.bin_a2, o.bin_b1, o.bin_b2)
 
 
-printflush("MCMs")
+ut.printflush("MCMs")
 fname_mcm_a = predir + 'cls_metacal_mcm_bins_'
 fname_mcm_a += '%d%d_ns%d.fits' % (o.bin_a1, o.bin_a2, o.nside)
 wa = nmt.NmtWorkspace()
@@ -237,7 +232,7 @@ else:
 nbpw = wa.wsp.bin.n_bands
 
 
-printflush("Covariance")
+ut.printflush("Covariance")
 cov = nmt.gaussian_covariance(cw, 2, 2, 2, 2,
                               clt['%d%d' % (o.bin_a1, o.bin_b1)],
                               clt['%d%d' % (o.bin_a1, o.bin_b2)],
@@ -285,7 +280,7 @@ if o.full_noise:
                                        cl_ones,
                                        wa, wb).reshape([nbpw, 4, nbpw, 4])*pix_area
 
-printflush("Writing")
+ut.printflush("Writing")
 fname_cov = predir + 'cls_metacal_covar_bins_'
 if not o.old_nka:
     fname_cov += "new_nka_"

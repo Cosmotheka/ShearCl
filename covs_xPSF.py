@@ -2,15 +2,10 @@ import numpy as np
 import healpy as hp
 from argparse import ArgumentParser
 import pymaster as nmt
+import utils as ut
 import os
 import sys
 import pyccl as ccl
-from scipy.interpolate import interp1d
-
-
-def printflush(msg):
-    print(msg)
-    sys.stdout.flush()
 
 
 parser = ArgumentParser()
@@ -19,19 +14,19 @@ parser.add_argument("--nside", default=4096, type=int, help="Nside")
 o = parser.parse_args()
 
 
-predir = '/mnt/extraspace/damonge/S8z_data/outputs/'
+predir = ut.rootpath = '/outputs/'
 
 npix = hp.nside2npix(o.nside)
 
-printflush("Running %d-PSF" % (o.bin_number))
+ut.printflush("Running %d-PSF" % (o.bin_number))
 
-printflush("MCM")
+ut.printflush("MCM")
 predir_mcm = predir + 'cls_metacal_mcm_bins_'
 fname_mcm = predir_mcm + '%d%d_ns%d.fits' % (o.bin_number, o.bin_number, o.nside)
 w = nmt.NmtWorkspace()
 w.read_from(fname_mcm)
 
-printflush("Theory spectra")
+ut.printflush("Theory spectra")
 ls = np.arange(3*o.nside)
 cl0 = np.zeros(3*o.nside)
 # Signal
@@ -61,7 +56,7 @@ cl_pp = dpsf['cls_coupled'] / fsky
 # G-PSF
 cl_gp = np.array([cl0, cl0, cl0, cl0])
 
-printflush("CMCM")
+ut.printflush("CMCM")
 fname_cmcm = predir + 'cls_metacal_cmcm_bins_'
 fname_cmcm += '%d%d_%d%d_ns%d.fits' % (o.bin_number, o.bin_number,
                                        o.bin_number, o.bin_number,
@@ -69,13 +64,13 @@ fname_cmcm += '%d%d_%d%d_ns%d.fits' % (o.bin_number, o.bin_number,
 cw = nmt.NmtCovarianceWorkspace()
 cw.read_from(fname_cmcm)
 
-printflush("Covariance")
+ut.printflush("Covariance")
 nbpw = w.wsp.bin.n_bands
 cov = nmt.gaussian_covariance(cw, 2, 2, 2, 2,
                               cl_gg, cl_gp, cl_gp, cl_pp,
                               w, w).reshape([nbpw, 4, nbpw, 4])
 
-printflush("Writing")
+ut.printflush("Writing")
 fname_cov = predir + 'cls_metacal_covar_xpsf_bin'
 fname_cov += '%d_ns%d.npz' % (o.bin_number, o.nside)
 np.savez(fname_cov, cov=cov)
