@@ -1,14 +1,17 @@
 #!/bin/bash
 
-nside=4096
+#nside=4096
+#mem=5
+#nc=24
+nside=512
+mem=0.5
+nc=12
 irot_0=0
 nrot=1000
-mem=5
-nc=24
-run_cleanup=false
+run_cleanup=true
 run_mapping=false
 run_cls_signal=false
-run_windows=true
+run_windows=false
 run_cls_extra=false
 run_cov_signal=false
 run_cov_psf=false
@@ -22,12 +25,12 @@ do
     pyexec="addqueue -c ${comment} -q cmb -m 12 -n 1 /usr/bin/python3"
     comm="${pyexec} subsample.py --bin-number ${b}"
     echo ${comment}
-    if [ run_cleanup = true ] ; then
+    if [ $run_cleanup = true ] ; then
         ${comm}
     fi
 done
 echo " "
-
+exit
 
 echo "Mapping"
 for b in {0..3}
@@ -36,7 +39,7 @@ do
     pyexec="addqueue -c ${comment} -q cmb -m 12 -n 1 /usr/bin/python3"
     comm="${pyexec} map.py --bin-number ${b} --nside ${nside} --nrot ${nrot}"
     echo ${comment}
-    if [ run_mapping = true ] ; then
+    if [ $run_mapping = true ] ; then
         ${comm}
     fi
 done
@@ -55,7 +58,7 @@ do
 	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
 	comm="${pyexec} cls.py --bin-number ${b1} --bin-number-2 ${b2} --nside ${nside} --n-iter 0"
 	echo ${comment}
-        if [ run_cls_signal = true ] ; then
+        if [ $run_cls_signal = true ] ; then
             ${comm}
         fi
     done
@@ -75,7 +78,7 @@ do
 	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
 	comm="${pyexec} windows.py --bin-number ${b1} --bin-number-2 ${b2} --nside ${nside}"
 	echo ${comment}
-        if [ run_windows = true ] ; then
+        if [ $run_windows = true ] ; then
 	    ${comm}
         fi
     done
@@ -90,7 +93,7 @@ do
     pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --irot-0 ${irot_0} --irot-f ${nrot}"
     echo ${comment}
-    if [ run_cls_extra = true ] ; then
+    if [ $run_cls_extra = true ] ; then
         ${comm}
     fi
     #PSF-x
@@ -98,7 +101,7 @@ do
     pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --is-psf-x"
     echo ${comment}
-    if [ run_cls_extra = true ] ; then
+    if [ $run_cls_extra = true ] ; then
         ${comm}
     fi
     #PSF-a
@@ -106,7 +109,7 @@ do
     pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --is-psf-a"
     echo ${comment}
-    if [ run_cls_signal = true ] ; then
+    if [ $run_cls_signal = true ] ; then
         ${comm}
     fi
 done
@@ -141,7 +144,7 @@ do
 		comm="${pyexec} covs.py --bin-a1 ${ba1} --bin-a2 ${ba2} --bin-b1 ${bb1} --bin-b2 ${bb2} --nside ${nside} --n-iter 0 --full-noise"
 
 		echo ${comment}
-                if [ run_cov_signal = true ] ; then
+                if [ $run_cov_signal = true ] ; then
                     ${comm}
                 fi
 		((ib++))
@@ -161,7 +164,7 @@ do
     pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
     comm="${pyexec} covs_xPSF.py --bin-number ${b} --nside ${nside}"
     echo ${comment}
-    if [ run_cov_psf = true ] ; then
+    if [ $run_cov_psf = true ] ; then
         ${comm}
     fi
 done

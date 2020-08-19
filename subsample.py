@@ -1,5 +1,4 @@
 import numpy as np
-from maptools import get_fits_iterator
 from astropy.io import fits
 from argparse import ArgumentParser
 
@@ -14,6 +13,31 @@ predir = '/mnt/extraspace/damonge/S8z_data/'
 fname_mcal = predir + 'DES_data/shear_catalog/mcal-y1a1-combined-riz-unblind-v4-matched.fits'
 fname_bins = predir + 'DES_data/shear_catalog/y1_source_redshift_binning_v1.fits'
 prefix_out = predir + 'outputs/catalog_metacal_bin%d' % (o.bin_number)
+
+
+def get_fits_iterator(fname, colnames, hdu=1, nrows_per_chunk=None):
+    import fitsio
+
+    # Open file and select HDU
+    fitf = fitsio.FITS(fname, mode='r')
+    tab = fitf[hdu]
+
+    # Count rows and number of chunks
+    nrows = tab.get_nrows()
+    # If None, then just one chunk
+    if nrows_per_chunk is None:
+        nrows_per_chunk = nrows
+    # Add one chunk if there are leftovers
+    nchunks = nrows // nrows_per_chunk
+    if nrows_per_chunk * nchunks < nrows:
+        nchunks += 1
+
+    for i in range(nchunks):
+        start = i * nrows_per_chunk
+        end = min((i + 1) * nrows_per_chunk, nrows)
+        data = tab.read_columns(colnames,
+                                rows=range(start, end))
+        yield data
 
 
 def get_iterator_metacal():
