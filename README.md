@@ -18,6 +18,7 @@ The paper presents measurements of the shear power spectrum, their covariance ma
 These data are available in [SACC](https://github.com/LSSTDESC/sacc) format. See the [documentation](https://sacc.readthedocs.io/en/latest/) in the SACC repository and the examples provided below for details on how to read and interpret the data.
 
 ## A working pipeline
+The folder [pipeline_des](pipeline_des) contains all the scripts used to download and analyse the DES data as a practical demonstration of the methods described in the paper.
 
 ## Examples
 
