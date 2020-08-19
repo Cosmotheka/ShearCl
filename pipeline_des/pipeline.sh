@@ -8,13 +8,29 @@ mem=0.5
 nc=12
 irot_0=0
 nrot=1000
+# Set to true if you want to run the cleanup stage
 run_cleanup=true
+# Set to true if you want to run the mapping stage
+# (don't do this until cleanup has finished).
 run_mapping=false
+# Set to true if you want to run the C_ell stage
+# (don't do this until mapping has finished).
 run_cls_signal=false
+# Set to true if you want to compute the bandpower windows
+# (don't do this until the C_ell stage has finished).
 run_windows=false
+# Set to true if you want to compute the PSF null spectra
+# and the spectra for rotated ellipticities.
+# (don't do this until the mapping stage has finished).
 run_cls_extra=false
+# Set to true if you want to run the covariance stage
+# (don't do this until the C_ell stage has finished).
 run_cov_signal=false
+# Set to true if you want to compute covariances for
+# the PSF null tests (don't do this until the C_ell
+# stage has finished).
 run_cov_psf=false
+
 
 mkdir -p /mnt/extraspace/damonge/S8z_data/outputs
 
