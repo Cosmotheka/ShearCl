@@ -1,6 +1,6 @@
 # Cosmic shear power spectra
 
-This repository accompanies the paper "Cosmic shear power spectra in practice" [arXiv:2009.ABCDE](dead_link), which covers in details the main steps in the process of estimating pseudo-CL power spectra for cosmic shear, including their covariance matrices, and interpreting them in a cosmological analysis.
+This repository accompanies the paper "Cosmic shear power spectra in practice" [arXiv:2009.ABCDE](dead_link), which covers in detail the main steps in the process of estimating pseudo-CL power spectra for cosmic shear, including their covariance matrices, and interpreting them in a cosmological analysis.
 
 The resources hosted here are:
 
