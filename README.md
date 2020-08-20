@@ -21,4 +21,13 @@ These data are available in [SACC](https://github.com/LSSTDESC/sacc) format. See
 The folder [pipeline_des](pipeline_des) contains all the scripts used to download and analyse the DES data as a practical demonstration of the methods described in the paper.
 
 ## Examples
+The [examples](examples) folder contains two notebooks describing in some detail the contents of the [HSC](dead_link) and [DES](examples/ClExampleDES.ipynb) data files and how to use them.
 
+## Credit and feedback
+If you use these data or the methods presented in the [paper](dead_link), we kindly ask you to cite it.
+
+If you have questions or find any issues with the data, feel free to open an issue here or contact the authors directly:
+
+    Andrina Nicola (@anicola)
+    Carlos Garcia-Garcia (@carlosggarcia)
+    David Alonso (@damonge)
