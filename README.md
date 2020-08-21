@@ -11,9 +11,9 @@ The paper presents measurements of the shear power spectrum, their covariance ma
   * Noise bias and non-Gaussian contributions to the shear power spectrum covariance matrix can be found [here](dead_link).
 
 2. **DES data:**
-  * Shear power spectra, Gaussian covariance, bandpower window functions and redshift distributions can be found [here](http://intensitymapping.physics.ox.ac.uk/Data/ShearCl/cls_signal_covG_ns4096.fits).
-  * Noise bias and non-Gaussian contributions to the shear power spectrum covariance matrix can be found [here](http://intensitymapping.physics.ox.ac.uk/Data/ShearCl/cls_noise_covNG_ns4096.fits).
-  * PSF null tests can be found [here](http://intensitymapping.physics.ox.ac.uk/Data/ShearCl/cls_xpsf_ns4096.fits).
+  * Shear power spectra, Gaussian covariance, bandpower window functions and redshift distributions can be found [here](https://entangled.physics.ox.ac.uk/index.php/s/Dxxu7NvtTo2JaUt/download).
+  * Noise bias and non-Gaussian contributions to the shear power spectrum covariance matrix can be found [here](https://entangled.physics.ox.ac.uk/index.php/s/lBIJPzwkcWhXQv0/download).
+  * PSF null tests can be found [here](https://entangled.physics.ox.ac.uk/index.php/s/gSxY7Q3P4SJrgDW/download).
 
 These data are available in [SACC](https://github.com/LSSTDESC/sacc) format. See the [documentation](https://sacc.readthedocs.io/en/latest/) in the SACC repository and the examples provided below for details on how to read and interpret the data.
 
