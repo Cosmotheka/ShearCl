@@ -34,11 +34,11 @@ ls = np.arange(3*o.nside)
 cl0 = np.zeros(3*o.nside)
 cl1 = np.ones(3*o.nside)
 
-cosmo = ccl.Cosmology(Omega_c=0.260-0.0479,
-                      Omega_b=0.0479,
-                      h=0.685,
-                      n_s=0.973,
-                      sigma8=0.821)
+cosmo = ccl.Cosmology(Omega_c=0.264,
+                      Omega_b=0.0493,
+                      h=0.6736,
+                      n_s=0.9649,
+                      sigma8=0.8111)
 
 
 def get_field(bin_no, return_mask=False, mask_sigma=False):

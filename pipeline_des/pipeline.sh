@@ -1,11 +1,18 @@
 #!/bin/bash
 
-#nside=4096
-#mem=5
+nside=4096
+mem=5
+nc=24
+#nside=2048
+#mem=2
 #nc=24
-nside=512
-mem=0.5
-nc=12
+#nside=1024
+#mem=2
+#nc=12
+#nside=512
+#mem=0.5
+#nc=12
+queue=berg
 irot_0=0
 nrot=1000
 # Set to true if you want to extract the N(z)s
@@ -31,7 +38,7 @@ run_cov_signal=true
 # Set to true if you want to compute covariances for
 # the PSF null tests (don't do this until the C_ell
 # stage has finished).
-run_cov_psf=true
+run_cov_psf=false
 
 
 mkdir -p /mnt/extraspace/damonge/S8z_data/outputs
@@ -47,7 +54,7 @@ echo "Catalog cleanup"
 for b in {0..3}
 do
     comment="binning_${b}"
-    pyexec="addqueue -c ${comment} -q cmb -m 12 -n 1 /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -q ${queue} -m 12 -n 1 /usr/bin/python3"
     comm="${pyexec} subsample.py --bin-number ${b}"
     echo ${comment}
     if [ $run_cleanup = true ] ; then
@@ -61,7 +68,7 @@ echo "Mapping"
 for b in {0..3}
 do
     comment="mapping_${b}_ns${nside}_nr${nrot}"
-    pyexec="addqueue -c ${comment} -q cmb -m 12 -n 1 /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -q ${queue} -m 12 -n 1 /usr/bin/python3"
     comm="${pyexec} map.py --bin-number ${b} --nside ${nside} --nrot ${nrot}"
     echo ${comment}
     if [ $run_mapping = true ] ; then
@@ -80,7 +87,7 @@ do
 	    continue
 	fi
 	comment="ss_${b1}_${b2}_ns${nside}"
-	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
 	comm="${pyexec} cls.py --bin-number ${b1} --bin-number-2 ${b2} --nside ${nside} --n-iter 0"
 	echo ${comment}
         if [ $run_cls_signal = true ] ; then
@@ -100,7 +107,7 @@ do
 	    continue
 	fi
 	comment="win_${b1}_${b2}_ns${nside}"
-	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+	pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
 	comm="${pyexec} windows.py --bin-number ${b1} --bin-number-2 ${b2} --nside ${nside}"
 	echo ${comment}
         if [ $run_windows = true ] ; then
@@ -116,7 +123,7 @@ for b in {0..3}
 do
     #Rotations
     comment="rots_${b}_ns${nside}"
-    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --irot-0 ${irot_0} --irot-f ${nrot}"
     echo ${comment}
     if [ $run_cls_extra = true ] ; then
@@ -124,7 +131,7 @@ do
     fi
     #PSF-x
     comment="psfX_${b}_ns${nside}"
-    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --is-psf-x"
     echo ${comment}
     if [ $run_cls_extra = true ] ; then
@@ -132,7 +139,7 @@ do
     fi
     #PSF-a
     comment="psfA_${b}_ns${nside}"
-    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
     comm="${pyexec} cls.py --bin-number ${b} --nside ${nside} --n-iter 0 --is-psf-a"
     echo ${comment}
     if [ $run_cls_extra = true ] ; then
@@ -166,7 +173,7 @@ do
 		    continue
 		fi
 		comment="cv_${ba1}${ba2}_${bb1}${bb2}_${ia}_${ib}_${icov}_ns${nside}"
-		pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+		pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
 		comm="${pyexec} covs.py --bin-a1 ${ba1} --bin-a2 ${ba2} --bin-b1 ${bb1} --bin-b2 ${bb2} --nside ${nside} --n-iter 0 --full-noise"
 
 		echo ${comment}
@@ -187,7 +194,7 @@ echo "Covs - PSF"
 for b in {0..3}
 do
     comment="cv_xpsf_${b}_ns${nside}"
-    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q cmb -m ${mem} /usr/bin/python3"
+    pyexec="addqueue -c ${comment} -n 1x${nc} -s -q ${queue} -m ${mem} /usr/bin/python3"
     comm="${pyexec} covs_xPSF.py --bin-number ${b} --nside ${nside}"
     echo ${comment}
     if [ $run_cov_psf = true ] ; then
