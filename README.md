@@ -1,6 +1,6 @@
 # Cosmic shear power spectra
 
-This repository accompanies the paper "Cosmic shear power spectra in practice" [arXiv:2009.ABCDE](dead_link), which covers in detail the main steps in the process of estimating pseudo-CL power spectra for cosmic shear, including their covariance matrices, and interpreting them in a cosmological analysis.
+This repository accompanies the paper "Cosmic shear power spectra in practice" [arXiv:2010.09717](https://arxiv.org/abs/2010.09717), which covers in detail the main steps in the process of estimating pseudo-CL power spectra for cosmic shear, including their covariance matrices, and interpreting them in a cosmological analysis.
 
 The resources hosted here are:
 
@@ -24,7 +24,7 @@ The folder [pipeline_des](pipeline_des) contains all the scripts used to downloa
 The [examples](examples) folder contains two notebooks describing in some detail the contents of the [HSC](examples/ClExampleHSC.ipynb) and [DES](examples/ClExampleDES.ipynb) data files and how to use them.
 
 ## Credit and feedback
-If you use these data or the methods presented in the [paper](dead_link), we kindly ask you to cite it.
+If you use these data or the methods presented in the [paper](https://arxiv.org/abs/2010.09717), we kindly ask you to cite it.
 
 If you have questions or find any issues with the data, feel free to open an issue here or contact the authors directly:
 
